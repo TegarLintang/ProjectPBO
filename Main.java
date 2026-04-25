@@ -4,7 +4,7 @@ import java.util.InputMismatchException;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        User user1 = new User("U001", "Lintang", "085877713117", 100000);
+        User user1 = new User("U001", "Budi", "085877713117", 100000);
         boolean isRunning = true;
 
         while (isRunning) {
