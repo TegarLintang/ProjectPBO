@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    // 1. ENCAPSULATION: Semua atribut diubah jadi private
     private String userID;
     private String name;
     private String phone;
@@ -26,11 +25,27 @@ public class User {
         this.transactionHistory = new ArrayList<>(); 
     }
 
-    // 2. GETTER & SETTER
+    //  GETTER & SETTER 
+    
+    // GETTER (Untuk membaca data)
+    public String getUserID() { return userID; }
     public String getName() { return name; }
+    public String getPhone() { return phone; }
     public double getBalance() { return balance; }
 
-    // 3. METHOD TOP UP (Dengan Validasi & Riwayat)
+    
+
+    public void setName(String name) {
+        if (name != null && !name.isEmpty()) {
+            this.name = name;
+        }
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    // METHOD TOP UP 
     public void topUp(double amount) {
         if (amount > 0) { // Validasi topUp harus positif
             balance += amount;
@@ -43,7 +58,7 @@ public class User {
         }
     }
 
-    // 4. METHOD PAY (Dengan Validasi & Riwayat)
+    // METHOD PAY
     public void pay(double amount) {
         if (amount <= 0) {
             System.out.println("Gagal: Jumlah pembayaran harus lebih dari 0!");
@@ -58,7 +73,7 @@ public class User {
         }
     }
 
-    // 5. METHOD SHOW TRANSACTION HISTORY
+    // METHOD SHOW TRANSACTION HISTORY
     public void showTransactionHistory() {
         System.out.println("\n--- Riwayat Transaksi: " + name + " ---");
         if (transactionHistory.isEmpty()) {
