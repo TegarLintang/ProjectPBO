@@ -6,34 +6,25 @@ public class User {
     private String name;
     private String phone;
     private double balance;
-    
-    // List untuk menyimpan riwayat transaksi
     private List<Transaction> transactionHistory;
 
     public User(String userID, String name, String phone, double balance) {
         this.userID = userID;
         this.name = name;
         this.phone = phone;
-        // Validasi saldo awal tidak boleh negatif
         if (balance >= 0) {
             this.balance = balance;
         } else {
             this.balance = 0;
-            System.out.println("Peringatan: Saldo awal tidak boleh negatif. Saldo diatur ke 0.");
+            System.out.println("Peringatan: Saldo awal tidak boleh negatif.");
         }
-        // Inisialisasi list history kosong
         this.transactionHistory = new ArrayList<>(); 
     }
 
-    //  GETTER & SETTER 
-    
-    // GETTER (Untuk membaca data)
     public String getUserID() { return userID; }
     public String getName() { return name; }
     public String getPhone() { return phone; }
     public double getBalance() { return balance; }
-
-    
 
     public void setName(String name) {
         if (name != null && !name.isEmpty()) {
@@ -45,12 +36,10 @@ public class User {
         this.phone = phone;
     }
 
-    // METHOD TOP UP 
     public void topUp(double amount) {
-        if (amount > 0) { // Validasi topUp harus positif
+        if (amount > 0) { 
             balance += amount;
-            System.out.println(name + " Berhasil melakukan top up sebesar Rp." + amount);
-            // Simpan ke riwayat
+            System.out.println(name + " Berhasil top up sebesar Rp." + amount);
             transactionHistory.add(new Transaction(amount, "TOP_UP", "SUCCESS"));
         } else {
             System.out.println("Gagal: Jumlah top up harus lebih dari 0!");
@@ -58,22 +47,20 @@ public class User {
         }
     }
 
-    // METHOD PAY
     public void pay(double amount) {
         if (amount <= 0) {
             System.out.println("Gagal: Jumlah pembayaran harus lebih dari 0!");
             transactionHistory.add(new Transaction(amount, "PAYMENT", "FAILED"));
-        } else if (balance >= amount) { // Validasi saldo cukup
+        } else if (balance >= amount) { 
             balance -= amount;
             System.out.println(name + " Berhasil melakukan pembayaran sebesar Rp." + amount);
             transactionHistory.add(new Transaction(amount, "PAYMENT", "SUCCESS"));
         } else {
-            System.out.println(name + " Saldo tidak cukup untuk melakukan pembayaran sebesar Rp." + amount);
+            System.out.println(name + " Saldo tidak cukup untuk membayar Rp." + amount);
             transactionHistory.add(new Transaction(amount, "PAYMENT", "FAILED"));
         }
     }
 
-    // METHOD SHOW TRANSACTION HISTORY
     public void showTransactionHistory() {
         System.out.println("\n--- Riwayat Transaksi: " + name + " ---");
         if (transactionHistory.isEmpty()) {
@@ -83,17 +70,22 @@ public class User {
                 t.printTransaction();
             }
         }
-        System.out.println("----------------------------------\n");
     }
 
     public void showBalance() {
-        System.out.println("================================");
-        System.out.println("        STATUS E-WALLET         ");
-        System.out.println("================================");
+        System.out.println("\n=== STATUS E-WALLET ===");
         System.out.println("ID User  : " + userID);
         System.out.println("Nama     : " + name);
         System.out.println("No. Telp : " + phone);
         System.out.println("Saldo    : Rp" + balance);
-        System.out.println("================================\n");
+    }
+
+    // Method protected agar Subclass bisa nambah saldo dan riwayat (Encapsulation aman)
+    protected void addBalance(double amount) {
+        this.balance += amount;
+    }
+
+    protected void addTransactionRecord(Transaction t) {
+        this.transactionHistory.add(t);
     }
 }

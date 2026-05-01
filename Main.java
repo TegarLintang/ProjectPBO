@@ -4,18 +4,54 @@ import java.util.InputMismatchException;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        User user1 = new User("U001", "Budi", "085877713117", 100000);
+        
+        System.out.println("=== LOGIN E-WALLET LINTANG ===");
+        System.out.println("Pilih tipe akun Anda untuk masuk:");
+        System.out.println("1. Regular User (Limit Rp2 Juta, Cashback 1%)");
+        System.out.println("2. Premium User (Limit Rp10 Juta, Cashback 5%)");
+        System.out.println("3. Merchant User (Limit Rp50 Juta, Bisa terima pembayaran)");
+        System.out.print("Pilih (1-3): ");
+        
+        int tipeAkun = 1; 
+        try {
+            tipeAkun = scanner.nextInt();
+            scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("Input salah! Otomatis login sebagai Regular User.");
+            scanner.nextLine();
+        }
+
+        // Inheritance & Polymorphic Reference di Main
+        User activeUser;
+        if (tipeAkun == 2) {
+            activeUser = new PremiumUser("U001", "Lintang Premium", "085877713117", 100000);
+            System.out.println("\n[!] Login sebagai Premium User. Limit: Rp" + ((PremiumUser)activeUser).getTransactionLimit());
+        } else if (tipeAkun == 3) {
+            activeUser = new MerchantUser("U001", "Lintang Store", "085877713117", 100000);
+            System.out.println("\n[!] Login sebagai Merchant User. Limit: Rp" + ((MerchantUser)activeUser).getTransactionLimit());
+        } else {
+            activeUser = new RegularUser("U001", "Lintang Regular", "085877713117", 100000);
+            System.out.println("\n[!] Login sebagai Regular User. Limit: Rp" + ((RegularUser)activeUser).getTransactionLimit());
+        }
+
         boolean isRunning = true;
 
         while (isRunning) {
-            System.out.println("\n=== MENU E-WALLET: " + user1.getName().toUpperCase() + " ===");
+            System.out.println("\n=== MENU E-WALLET: " + activeUser.getName().toUpperCase() + " ===");
             System.out.println("1. Tampilkan Saldo");
             System.out.println("2. Top Up");
-            System.out.println("3. Bayar");
-            System.out.println("4. Riwayat Transaksi");
-            System.out.println("5. Edit Profil (Ganti Nama/No HP)");
-            System.out.println("6. Keluar");
-            System.out.print("Pilih menu (1-6): ");
+            System.out.println("3. Bayar Tagihan (Dapat Cashback!)");
+            System.out.println("4. Transfer Dana");
+            System.out.println("5. Riwayat Transaksi");
+            
+            if (activeUser instanceof MerchantUser) {
+                System.out.println("6. Terima Pembayaran (Khusus Merchant)");
+                System.out.println("7. Keluar");
+            } else {
+                System.out.println("6. Keluar");
+            }
+            
+            System.out.print("Pilih menu: ");
 
             try {
                 int pilihan = scanner.nextInt();
@@ -23,51 +59,70 @@ public class Main {
 
                 switch (pilihan) {
                     case 1:
-                        user1.showBalance();
+                        activeUser.showBalance();
                         break;
                     case 2:
                         System.out.print("Masukkan nominal Top Up: Rp");
-                        double nominalTopUp = scanner.nextDouble();
-                        user1.topUp(nominalTopUp);
+                        activeUser.topUp(scanner.nextDouble());
                         break;
                     case 3:
-                        System.out.print("Masukkan nominal Tagihan: Rp");
-                        double nominalBayar = scanner.nextDouble();
-                        user1.pay(nominalBayar);
+                        System.out.print("Masukkan nominal Bayar: Rp");
+                        activeUser.pay(scanner.nextDouble()); 
                         break;
                     case 4:
-                        user1.showTransactionHistory();
-                        break;
-                    case 5:
-                        System.out.println("\n--- EDIT PROFIL ---");
-                        System.out.println("1. Ubah Nama");
-                        System.out.println("2. Ubah No HP");
-                        System.out.print("Pilih data yang ingin diubah (1/2): ");
+                        System.out.println("\n--- PILIH METODE TRANSFER ---");
+                        System.out.println("1. Bank Transfer");
+                        System.out.println("2. QR Payment");
+                        System.out.println("3. Wallet Transfer");
+                        System.out.print("Pilih metode (1-3): ");
+                        int metode = scanner.nextInt();
+                        scanner.nextLine();
                         
-                        int opsiEdit = scanner.nextInt();
-                        scanner.nextLine(); 
+                        System.out.print("Masukkan nominal Transfer: Rp");
+                        double nomTransfer = scanner.nextDouble();
+                        scanner.nextLine();
                         
-                        if (opsiEdit == 1) {
-                            System.out.print("Masukkan Nama Baru: ");
-                            String namaBaru = scanner.nextLine();
-                            user1.setName(namaBaru); 
-                            System.out.println("Sukses! Nama diubah menjadi: " + user1.getName());
-                        } else if (opsiEdit == 2) {
-                            System.out.print("Masukkan No HP Baru: ");
-                            String hpBaru = scanner.nextLine();
-                            user1.setPhone(hpBaru); 
-                            System.out.println("Sukses! No HP diubah menjadi: " + user1.getPhone());
+                        Payment transaksiTransfer = null;
+                        if (metode == 1) {
+                            System.out.print("Masukkan Nama Bank Tujuan: ");
+                            transaksiTransfer = new BankTransfer(nomTransfer, scanner.nextLine());
+                        } else if (metode == 2) {
+                            System.out.print("Masukkan ID QR Code: ");
+                            transaksiTransfer = new QRPayment(nomTransfer, scanner.nextLine());
+                        } else if (metode == 3) {
+                            System.out.print("Masukkan No HP Tujuan: ");
+                            transaksiTransfer = new WalletTransfer(nomTransfer, scanner.nextLine());
                         } else {
-                            System.out.println("Peringatan: Pilihan tidak valid! Anda harus mengetik angka 1 atau 2.");
-                            System.out.println("Gagal mengedit profil. Membatalkan aksi...");
+                            System.out.println("Metode transfer tidak valid!");
+                        }
+
+                        if (transaksiTransfer != null) {
+                            System.out.println("Memproses transfer menggunakan " + transaksiTransfer.getClass().getSimpleName() + "...");
+                            activeUser.pay(transaksiTransfer.getAmount());
                         }
                         break;
+                    case 5:
+                        activeUser.showTransactionHistory();
+                        break;
                     case 6:
-                        System.out.println("Terima kasih telah menggunakan E-Wallet!");
-                        isRunning = false;
+                        if (activeUser instanceof MerchantUser) {
+                            System.out.print("Masukkan nominal Pembayaran Masuk: Rp");
+                            ((MerchantUser) activeUser).receivePayment(scanner.nextDouble());
+                        } else {
+                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
+                            isRunning = false;
+                        }
+                        break;
+                    case 7:
+                        if (activeUser instanceof MerchantUser) {
+                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
+                            isRunning = false;
+                        } else {
+                            System.out.println("Pilihan tidak ada.");
+                        }
                         break;
                     default:
-                        System.out.println("Peringatan: Pilihan tidak ada. Silakan masukkan angka 1 sampai 6.");
+                        System.out.println("Pilihan tidak ada.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Error: Input tidak valid! Anda harus memasukkan angka.");
