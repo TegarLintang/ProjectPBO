@@ -4,7 +4,7 @@ public class PremiumUser extends User {
 
     public PremiumUser(String userID, String name, String phone, double balance) {
         super(userID, name, phone, balance); 
-        this.transactionLimit = 10000000;    // Limit 10 Juta
+        this.transactionLimit = 10000000;    
         this.cashbackRate = 0.05;            
     }
 
@@ -13,8 +13,8 @@ public class PremiumUser extends User {
 
     @Override
     public void topUp(double amount) {
-        if (getBalance() + amount > transactionLimit) {
-            System.out.println("Gagal: Top Up ditolak! Saldo akan melebihi limit Premium User (Maks Rp10.000.000).");
+        if (amount > transactionLimit) {
+            System.out.println("Gagal: Nominal Top Up melebihi limit per transaksi Premium User (Maks Rp10.000.000).");
             addTransactionRecord(new Transaction(amount, "TOP_UP", "FAILED"));
         } else {
             super.topUp(amount); 
@@ -24,7 +24,7 @@ public class PremiumUser extends User {
     @Override
     public void pay(double amount) {
         if (amount > transactionLimit) {
-            System.out.println("Gagal: Nominal bayar melebihi limit transaksi Premium User (Maks Rp10.000.000).");
+            System.out.println("Gagal: Nominal bayar melebihi limit per transaksi Premium User (Maks Rp10.000.000).");
             addTransactionRecord(new Transaction(amount, "PAYMENT", "FAILED"));
             return; 
         }

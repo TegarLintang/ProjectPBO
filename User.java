@@ -80,7 +80,6 @@ public class User {
         System.out.println("Saldo    : Rp" + balance);
     }
 
-    // Method protected agar Subclass bisa nambah saldo dan riwayat (Encapsulation aman)
     protected void addBalance(double amount) {
         this.balance += amount;
     }

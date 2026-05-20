@@ -3,15 +3,15 @@ public class MerchantUser extends User {
 
     public MerchantUser(String userID, String name, String phone, double balance) {
         super(userID, name, phone, balance);
-        this.transactionLimit = 50000000;    // Limit 50 Juta
+        this.transactionLimit = 50000000;    
     }
 
     public double getTransactionLimit() { return transactionLimit; }
 
     @Override
     public void topUp(double amount) {
-        if (getBalance() + amount > transactionLimit) {
-            System.out.println("Gagal: Top Up ditolak! Saldo akan melebihi limit Merchant User (Maks Rp50.000.000).");
+        if (amount > transactionLimit) {
+            System.out.println("Gagal: Nominal Top Up melebihi limit per transaksi Merchant User (Maks Rp50.000.000).");
             addTransactionRecord(new Transaction(amount, "TOP_UP", "FAILED"));
         } else {
             super.topUp(amount); 
@@ -21,19 +21,18 @@ public class MerchantUser extends User {
     @Override
     public void pay(double amount) {
         if (amount > transactionLimit) {
-            System.out.println("Gagal: Nominal bayar melebihi limit transaksi Merchant User (Maks Rp50.000.000).");
+            System.out.println("Gagal: Nominal bayar melebihi limit per transaksi Merchant User (Maks Rp50.000.000).");
             addTransactionRecord(new Transaction(amount, "PAYMENT", "FAILED"));
             return; 
         }
-        super.pay(amount); // Merchant tidak dapat cashback di instruksinya
+        super.pay(amount); 
     }
 
     public void receivePayment(double amount) {
         if (amount <= 0) {
             System.out.println("Gagal menerima pembayaran: Nominal tidak valid!");
-        } else if (getBalance() + amount > transactionLimit) {
-            // Validasi limit juga berlaku saat Merchant menerima dana
-            System.out.println("Gagal: Dana masuk ditolak karena akan melampaui limit penyimpanan Merchant (Rp50 Juta)!");
+        } else if (amount > transactionLimit) {
+            System.out.println("Gagal: Dana masuk ditolak karena melebihi limit per transaksi (Maks Rp50.000.000)!");
         } else {
             addBalance(amount); 
             addTransactionRecord(new Transaction(amount, "RECEIVE", "SUCCESS"));

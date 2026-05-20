@@ -5,7 +5,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
-        System.out.println("=== LOGIN E-WALLET LINTANG ===");
+        System.out.println("=== LOGIN E-WALLET ===");
         System.out.println("Pilih tipe akun Anda untuk masuk:");
         System.out.println("1. Regular User (Limit Rp2 Juta, Cashback 1%)");
         System.out.println("2. Premium User (Limit Rp10 Juta, Cashback 5%)");
@@ -24,13 +24,13 @@ public class Main {
         // Inheritance & Polymorphic Reference di Main
         User activeUser;
         if (tipeAkun == 2) {
-            activeUser = new PremiumUser("U001", "Lintang Premium", "085877713117", 100000);
+            activeUser = new PremiumUser("U001", "User Premium", "085877713117", 100000);
             System.out.println("\n[!] Login sebagai Premium User. Limit: Rp" + ((PremiumUser)activeUser).getTransactionLimit());
         } else if (tipeAkun == 3) {
-            activeUser = new MerchantUser("U001", "Lintang Store", "085877713117", 100000);
+            activeUser = new MerchantUser("U001", "User Merchant", "085877713117", 100000);
             System.out.println("\n[!] Login sebagai Merchant User. Limit: Rp" + ((MerchantUser)activeUser).getTransactionLimit());
         } else {
-            activeUser = new RegularUser("U001", "Lintang Regular", "085877713117", 100000);
+            activeUser = new RegularUser("U001", "User Regular", "085877713117", 100000);
             System.out.println("\n[!] Login sebagai Regular User. Limit: Rp" + ((RegularUser)activeUser).getTransactionLimit());
         }
 
@@ -40,7 +40,7 @@ public class Main {
             System.out.println("\n=== MENU E-WALLET: " + activeUser.getName().toUpperCase() + " ===");
             System.out.println("1. Tampilkan Saldo");
             System.out.println("2. Top Up");
-            System.out.println("3. Bayar Tagihan (Dapat Cashback!)");
+            System.out.println("3. Bayar Tagihan");
             System.out.println("4. Transfer Dana");
             System.out.println("5. Riwayat Transaksi");
             
