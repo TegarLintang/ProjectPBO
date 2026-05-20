@@ -4,4 +4,9 @@ public class BankTransfer extends Payment {
         super(amount);
         this.bankName = bankName;
     }
+
+    @Override
+    public double calculateFee() {
+        return 2500.0; 
+    }
 }

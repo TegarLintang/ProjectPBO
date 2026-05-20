@@ -71,9 +71,9 @@ public class Main {
                         break;
                     case 4:
                         System.out.println("\n--- PILIH METODE TRANSFER ---");
-                        System.out.println("1. Bank Transfer");
-                        System.out.println("2. QR Payment");
-                        System.out.println("3. Wallet Transfer");
+                        System.out.println("1. Bank Transfer (Admin Rp 2.500)");
+                        System.out.println("2. QR Payment (Admin 0.7% > 100rb)");
+                        System.out.println("3. Wallet Transfer (Gratis)");
                         System.out.print("Pilih metode (1-3): ");
                         int metode = scanner.nextInt();
                         scanner.nextLine();
@@ -82,7 +82,9 @@ public class Main {
                         double nomTransfer = scanner.nextDouble();
                         scanner.nextLine();
                         
+                        // Referensi Polimorfisme
                         Payment transaksiTransfer = null;
+                        
                         if (metode == 1) {
                             System.out.print("Masukkan Nama Bank Tujuan: ");
                             transaksiTransfer = new BankTransfer(nomTransfer, scanner.nextLine());
@@ -96,29 +98,17 @@ public class Main {
                             System.out.println("Metode transfer tidak valid!");
                         }
 
+                        // Eksekusi Polimorfisme Biaya Admin
                         if (transaksiTransfer != null) {
-                            System.out.println("Memproses transfer menggunakan " + transaksiTransfer.getClass().getSimpleName() + "...");
-                            activeUser.pay(transaksiTransfer.getAmount());
-                        }
-                        break;
-                    case 5:
-                        activeUser.showTransactionHistory();
-                        break;
-                    case 6:
-                        if (activeUser instanceof MerchantUser) {
-                            System.out.print("Masukkan nominal Pembayaran Masuk: Rp");
-                            ((MerchantUser) activeUser).receivePayment(scanner.nextDouble());
-                        } else {
-                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
-                            isRunning = false;
-                        }
-                        break;
-                    case 7:
-                        if (activeUser instanceof MerchantUser) {
-                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
-                            isRunning = false;
-                        } else {
-                            System.out.println("Pilihan tidak ada.");
+                            double biayaAdmin = transaksiTransfer.calculateFee(); // Akan mengeksekusi rumus yang berbeda-beda
+                            double totalPotongan = transaksiTransfer.getAmount() + biayaAdmin;
+                            
+                            System.out.println("\nMemproses transfer menggunakan " + transaksiTransfer.getClass().getSimpleName() + "...");
+                            System.out.println("Nominal Transfer : Rp" + transaksiTransfer.getAmount());
+                            System.out.println("Biaya Admin      : Rp" + biayaAdmin);
+                            System.out.println("Total Pemotongan : Rp" + totalPotongan);
+                            
+                            activeUser.pay(totalPotongan); // Potong saldo beserta adminnya
                         }
                         break;
                     default:

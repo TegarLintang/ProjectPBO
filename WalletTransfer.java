@@ -4,4 +4,9 @@ public class WalletTransfer extends Payment {
         super(amount);
         this.targetPhoneNumber = targetPhoneNumber;
     }
+
+    @Override
+    public double calculateFee() {
+        return 0.0; // Selalu gratis
+    }
 }
