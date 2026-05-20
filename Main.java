@@ -21,17 +21,17 @@ public class Main {
             scanner.nextLine();
         }
 
-        // Inheritance & Polymorphic Reference di Main
+        // Inheritance & Polymorphic Reference
         User activeUser;
         if (tipeAkun == 2) {
-            activeUser = new PremiumUser("U001", "User Premium", "085877713117", 100000);
-            System.out.println("\n[!] Login sebagai Premium User. Limit: Rp" + ((PremiumUser)activeUser).getTransactionLimit());
+            activeUser = new PremiumUser("U001", "User Premium", "085877713117", 500000);
+            System.out.println("\n[!] Login sebagai Premium User. Limit per transaksi: Rp" + ((PremiumUser)activeUser).getTransactionLimit());
         } else if (tipeAkun == 3) {
-            activeUser = new MerchantUser("U001", "User Merchant", "085877713117", 100000);
-            System.out.println("\n[!] Login sebagai Merchant User. Limit: Rp" + ((MerchantUser)activeUser).getTransactionLimit());
+            activeUser = new MerchantUser("U001", "User Merchant", "085877713117", 500000);
+            System.out.println("\n[!] Login sebagai Merchant User. Limit per transaksi: Rp" + ((MerchantUser)activeUser).getTransactionLimit());
         } else {
-            activeUser = new RegularUser("U001", "User Regular", "085877713117", 100000);
-            System.out.println("\n[!] Login sebagai Regular User. Limit: Rp" + ((RegularUser)activeUser).getTransactionLimit());
+            activeUser = new RegularUser("U001", "User Regular", "085877713117", 500000);
+            System.out.println("\n[!] Login sebagai Regular User. Limit per transaksi: Rp" + ((RegularUser)activeUser).getTransactionLimit());
         }
 
         boolean isRunning = true;
@@ -40,7 +40,14 @@ public class Main {
             System.out.println("\n=== MENU E-WALLET: " + activeUser.getName().toUpperCase() + " ===");
             System.out.println("1. Tampilkan Saldo");
             System.out.println("2. Top Up");
-            System.out.println("3. Bayar Tagihan");
+            
+            // Penyesuaian tampilan menu agar logis sesuai tipe objek (instanceof)
+            if (activeUser instanceof MerchantUser) {
+                System.out.println("3. Bayar Tagihan");
+            } else {
+                System.out.println("3. Bayar Tagihan (Dapat Cashback!)");
+            }
+            
             System.out.println("4. Transfer Dana");
             System.out.println("5. Riwayat Transaksi");
             
@@ -72,7 +79,7 @@ public class Main {
                     case 4:
                         System.out.println("\n--- PILIH METODE TRANSFER ---");
                         System.out.println("1. Bank Transfer (Admin Rp 2.500)");
-                        System.out.println("2. QR Payment (Admin 0.7% > 100rb)");
+                        System.out.println("2. QR Payment (Admin 0.7% untuk nominal > Rp 100.000)");
                         System.out.println("3. Wallet Transfer (Gratis)");
                         System.out.print("Pilih metode (1-3): ");
                         int metode = scanner.nextInt();
@@ -82,9 +89,8 @@ public class Main {
                         double nomTransfer = scanner.nextDouble();
                         scanner.nextLine();
                         
-                        // Referensi Polimorfisme
+                        // Referensi Polimorfisme untuk objek Payment
                         Payment transaksiTransfer = null;
-                        
                         if (metode == 1) {
                             System.out.print("Masukkan Nama Bank Tujuan: ");
                             transaksiTransfer = new BankTransfer(nomTransfer, scanner.nextLine());
@@ -100,7 +106,7 @@ public class Main {
 
                         // Eksekusi Polimorfisme Biaya Admin
                         if (transaksiTransfer != null) {
-                            double biayaAdmin = transaksiTransfer.calculateFee(); // Akan mengeksekusi rumus yang berbeda-beda
+                            double biayaAdmin = transaksiTransfer.calculateFee(); // Memanggil rumus spesifik subclass
                             double totalPotongan = transaksiTransfer.getAmount() + biayaAdmin;
                             
                             System.out.println("\nMemproses transfer menggunakan " + transaksiTransfer.getClass().getSimpleName() + "...");
@@ -108,7 +114,27 @@ public class Main {
                             System.out.println("Biaya Admin      : Rp" + biayaAdmin);
                             System.out.println("Total Pemotongan : Rp" + totalPotongan);
                             
-                            activeUser.pay(totalPotongan); // Potong saldo beserta adminnya
+                            activeUser.pay(totalPotongan); // Memotong saldo kumulatif beserta biaya adminnya
+                        }
+                        break;
+                    case 5:
+                        activeUser.showTransactionHistory();
+                        break;
+                    case 6:
+                        if (activeUser instanceof MerchantUser) {
+                            System.out.print("Masukkan nominal Pembayaran Masuk: Rp");
+                            ((MerchantUser) activeUser).receivePayment(scanner.nextDouble());
+                        } else {
+                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
+                            isRunning = false;
+                        }
+                        break;
+                    case 7:
+                        if (activeUser instanceof MerchantUser) {
+                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
+                            isRunning = false;
+                        } else {
+                            System.out.println("Pilihan tidak ada.");
                         }
                         break;
                     default:
