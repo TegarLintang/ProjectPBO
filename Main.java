@@ -21,7 +21,6 @@ public class Main {
             scanner.nextLine();
         }
 
-        // Inheritance & Polymorphic Reference
         User activeUser;
         if (tipeAkun == 2) {
             activeUser = new PremiumUser("U001", "User Premium", "085877713117", 500000);
@@ -41,7 +40,6 @@ public class Main {
             System.out.println("1. Tampilkan Saldo");
             System.out.println("2. Top Up");
             
-            // Penyesuaian tampilan menu agar logis sesuai tipe objek (instanceof)
             if (activeUser instanceof MerchantUser) {
                 System.out.println("3. Bayar Tagihan");
             } else {
@@ -89,7 +87,6 @@ public class Main {
                         double nomTransfer = scanner.nextDouble();
                         scanner.nextLine();
                         
-                        // Referensi Polimorfisme untuk objek Payment
                         Payment transaksiTransfer = null;
                         if (metode == 1) {
                             System.out.print("Masukkan Nama Bank Tujuan: ");
@@ -104,17 +101,8 @@ public class Main {
                             System.out.println("Metode transfer tidak valid!");
                         }
 
-                        // Eksekusi Polimorfisme Biaya Admin
                         if (transaksiTransfer != null) {
-                            double biayaAdmin = transaksiTransfer.calculateFee(); // Memanggil rumus spesifik subclass
-                            double totalPotongan = transaksiTransfer.getAmount() + biayaAdmin;
-                            
-                            System.out.println("\nMemproses transfer menggunakan " + transaksiTransfer.getClass().getSimpleName() + "...");
-                            System.out.println("Nominal Transfer : Rp" + transaksiTransfer.getAmount());
-                            System.out.println("Biaya Admin      : Rp" + biayaAdmin);
-                            System.out.println("Total Pemotongan : Rp" + totalPotongan);
-                            
-                            activeUser.pay(totalPotongan); // Memotong saldo kumulatif beserta biaya adminnya
+                            activeUser.processPayment(transaksiTransfer); 
                         }
                         break;
                     case 5:

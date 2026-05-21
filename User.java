@@ -21,11 +21,13 @@ public class User {
         this.transactionHistory = new ArrayList<>(); 
     }
 
+    // Getter
     public String getUserID() { return userID; }
     public String getName() { return name; }
     public String getPhone() { return phone; }
     public double getBalance() { return balance; }
 
+    // Setter
     public void setName(String name) {
         if (name != null && !name.isEmpty()) {
             this.name = name;
@@ -86,5 +88,24 @@ public class User {
 
     protected void addTransactionRecord(Transaction t) {
         this.transactionHistory.add(t);
+    }
+
+    public void processPayment(Payment p) {
+        if (!p.validate()) {
+            System.out.println("Transfer dibatalkan karena data tidak sesuai.\n");
+            return; 
+        }
+
+        double biayaAdmin = p.calculateFee(); 
+        double totalPotongan = p.getAmount() + biayaAdmin;
+
+        System.out.println("\n--- RINCIAN TRANSFER ---");
+        System.out.println("Metode           : " + p.getClass().getSimpleName());
+        System.out.println("Nominal Transfer : Rp" + p.getAmount());
+        System.out.println("Biaya Admin      : Rp" + biayaAdmin);
+        System.out.println("Total Potongan   : Rp" + totalPotongan);
+        System.out.println("------------------------");
+
+        this.pay(totalPotongan); 
     }
 }

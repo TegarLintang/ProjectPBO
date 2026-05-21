@@ -1,5 +1,6 @@
 public class QRPayment extends Payment {
     private String qrCodeId;
+    
     public QRPayment(double amount, String qrCodeId) {
         super(amount);
         this.qrCodeId = qrCodeId;
@@ -8,8 +9,19 @@ public class QRPayment extends Payment {
     @Override
     public double calculateFee() {
         if (getAmount() > 100000) {
-            return getAmount() * 0.007; 
+            return getAmount() * 0.007;
         }
-        return 0.0; // Gratis
+        return 0.0;
+    }
+
+    @Override
+    public boolean validate() {
+        if (!super.validate()) return false; 
+        
+        if (qrCodeId == null || qrCodeId.trim().length() < 5) {
+            System.out.println("Validasi Gagal: ID QR Code tidak valid (Minimal wajib 5 karakter)!");
+            return false;
+        }
+        return true;
     }
 }
