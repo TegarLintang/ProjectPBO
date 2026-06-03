@@ -6,12 +6,20 @@ public class MerchantUser extends User {
         this.transactionLimit = 50000000;    
     }
 
+    // Override 3 method abstrak dari User
+    @Override
     public double getTransactionLimit() { return transactionLimit; }
+    
+    @Override
+    public double getCashbackRate() { return 0.0; } // Merchant tidak ada cashback
+    
+    @Override
+    public String getAccountType() { return "Merchant User"; }
 
     @Override
     public void topUp(double amount) {
         if (amount > transactionLimit) {
-            System.out.println("Gagal: Nominal Top Up melebihi limit per transaksi Merchant User (Maks Rp50.000.000).");
+            System.out.println("Gagal: Nominal Top Up melebihi limit per transaksi Merchant.");
             addTransactionRecord(new Transaction(amount, "TOP_UP", "FAILED"));
         } else {
             super.topUp(amount); 
@@ -21,7 +29,7 @@ public class MerchantUser extends User {
     @Override
     public void pay(double amount) {
         if (amount > transactionLimit) {
-            System.out.println("Gagal: Nominal bayar melebihi limit per transaksi Merchant User (Maks Rp50.000.000).");
+            System.out.println("Gagal: Nominal bayar melebihi limit per transaksi Merchant.");
             addTransactionRecord(new Transaction(amount, "PAYMENT", "FAILED"));
             return; 
         }
@@ -32,7 +40,7 @@ public class MerchantUser extends User {
         if (amount <= 0) {
             System.out.println("Gagal menerima pembayaran: Nominal tidak valid!");
         } else if (amount > transactionLimit) {
-            System.out.println("Gagal: Dana masuk ditolak karena melebihi limit per transaksi (Maks Rp50.000.000)!");
+            System.out.println("Gagal: Dana masuk ditolak karena melebihi limit!");
         } else {
             addBalance(amount); 
             addTransactionRecord(new Transaction(amount, "RECEIVE", "SUCCESS"));

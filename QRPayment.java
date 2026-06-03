@@ -16,12 +16,19 @@ public class QRPayment extends Payment {
 
     @Override
     public boolean validate() {
-        if (!super.validate()) return false; 
-        
+        if (getAmount() <= 0) {
+            System.out.println("Validasi Gagal: Nominal transfer harus lebih dari Rp 0.");
+            return false;
+        }
         if (qrCodeId == null || qrCodeId.trim().length() < 5) {
             System.out.println("Validasi Gagal: ID QR Code tidak valid (Minimal wajib 5 karakter)!");
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String getPaymentMethod() {
+        return "QR Code Payment";
     }
 }

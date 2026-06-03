@@ -24,14 +24,15 @@ public class Main {
         User activeUser;
         if (tipeAkun == 2) {
             activeUser = new PremiumUser("U001", "User Premium", "085877713117", 500000);
-            System.out.println("\n[!] Login sebagai Premium User. Limit per transaksi: Rp" + ((PremiumUser)activeUser).getTransactionLimit());
         } else if (tipeAkun == 3) {
             activeUser = new MerchantUser("U001", "User Merchant", "085877713117", 500000);
-            System.out.println("\n[!] Login sebagai Merchant User. Limit per transaksi: Rp" + ((MerchantUser)activeUser).getTransactionLimit());
         } else {
             activeUser = new RegularUser("U001", "User Regular", "085877713117", 500000);
-            System.out.println("\n[!] Login sebagai Regular User. Limit per transaksi: Rp" + ((RegularUser)activeUser).getTransactionLimit());
         }
+        
+        // Memanfaatkan Abstract Method getAccountType()
+        System.out.println("\n[!] Login sebagai: " + activeUser.getAccountType());
+        System.out.println("[!] Limit per transaksi: Rp" + activeUser.getTransactionLimit());
 
         boolean isRunning = true;
 
@@ -69,10 +70,12 @@ public class Main {
                     case 2:
                         System.out.print("Masukkan nominal Top Up: Rp");
                         activeUser.topUp(scanner.nextDouble());
+                        scanner.nextLine();
                         break;
                     case 3:
                         System.out.print("Masukkan nominal Bayar: Rp");
                         activeUser.pay(scanner.nextDouble()); 
+                        scanner.nextLine();
                         break;
                     case 4:
                         System.out.println("\n--- PILIH METODE TRANSFER ---");
@@ -85,9 +88,10 @@ public class Main {
                         
                         System.out.print("Masukkan nominal Transfer: Rp");
                         double nomTransfer = scanner.nextDouble();
-                        scanner.nextLine();
+                        scanner.nextLine(); 
                         
                         Payment transaksiTransfer = null;
+                        
                         if (metode == 1) {
                             System.out.print("Masukkan Nama Bank Tujuan: ");
                             transaksiTransfer = new BankTransfer(nomTransfer, scanner.nextLine());
@@ -112,6 +116,7 @@ public class Main {
                         if (activeUser instanceof MerchantUser) {
                             System.out.print("Masukkan nominal Pembayaran Masuk: Rp");
                             ((MerchantUser) activeUser).receivePayment(scanner.nextDouble());
+                            scanner.nextLine();
                         } else {
                             System.out.println("Terima kasih telah menggunakan E-Wallet!");
                             isRunning = false;

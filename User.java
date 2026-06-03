@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public abstract class User {
     private String userID;
     private String name;
     private String phone;
@@ -21,13 +21,11 @@ public class User {
         this.transactionHistory = new ArrayList<>(); 
     }
 
-    // Getter
     public String getUserID() { return userID; }
     public String getName() { return name; }
     public String getPhone() { return phone; }
     public double getBalance() { return balance; }
 
-    // Setter
     public void setName(String name) {
         if (name != null && !name.isEmpty()) {
             this.name = name;
@@ -78,7 +76,7 @@ public class User {
         System.out.println("\n=== STATUS E-WALLET ===");
         System.out.println("ID User  : " + userID);
         System.out.println("Nama     : " + name);
-        System.out.println("No. Telp : " + phone);
+        System.out.println("Tipe Akun: " + getAccountType()); // Mengambil tipe akun dari subclass
         System.out.println("Saldo    : Rp" + balance);
     }
 
@@ -100,7 +98,7 @@ public class User {
         double totalPotongan = p.getAmount() + biayaAdmin;
 
         System.out.println("\n--- RINCIAN TRANSFER ---");
-        System.out.println("Metode           : " + p.getClass().getSimpleName());
+        System.out.println("Metode           : " + p.getPaymentMethod()); // Diambil dari metode abstrak
         System.out.println("Nominal Transfer : Rp" + p.getAmount());
         System.out.println("Biaya Admin      : Rp" + biayaAdmin);
         System.out.println("Total Potongan   : Rp" + totalPotongan);
@@ -108,4 +106,9 @@ public class User {
 
         this.pay(totalPotongan); 
     }
+
+    // 3 Method abstrak wajib sesuai instruksi
+    public abstract double getTransactionLimit();
+    public abstract double getCashbackRate();
+    public abstract String getAccountType();
 }

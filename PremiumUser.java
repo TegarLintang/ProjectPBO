@@ -8,13 +8,20 @@ public class PremiumUser extends User {
         this.cashbackRate = 0.05;            
     }
 
+    // Override 3 method abstrak dari User
+    @Override
     public double getTransactionLimit() { return transactionLimit; }
+    
+    @Override
     public double getCashbackRate() { return cashbackRate; }
+    
+    @Override
+    public String getAccountType() { return "Premium User"; }
 
     @Override
     public void topUp(double amount) {
         if (amount > transactionLimit) {
-            System.out.println("Gagal: Nominal Top Up melebihi limit per transaksi Premium User (Maks Rp10.000.000).");
+            System.out.println("Gagal: Nominal Top Up melebihi limit per transaksi Premium User.");
             addTransactionRecord(new Transaction(amount, "TOP_UP", "FAILED"));
         } else {
             super.topUp(amount); 
@@ -24,7 +31,7 @@ public class PremiumUser extends User {
     @Override
     public void pay(double amount) {
         if (amount > transactionLimit) {
-            System.out.println("Gagal: Nominal bayar melebihi limit per transaksi Premium User (Maks Rp10.000.000).");
+            System.out.println("Gagal: Nominal bayar melebihi limit per transaksi Premium User.");
             addTransactionRecord(new Transaction(amount, "PAYMENT", "FAILED"));
             return; 
         }
@@ -33,10 +40,10 @@ public class PremiumUser extends User {
         super.pay(amount); 
         
         if (isSuccess) {
-            double cashback = amount * cashbackRate;
+            double cashback = amount * getCashbackRate(); // Menggunakan getter abstrak
             addBalance(cashback); 
             addTransactionRecord(new Transaction(cashback, "CASHBACK", "SUCCESS"));
-            System.out.println(">> Yeay! " + getName() + " dapat Cashback 5% sebesar Rp" + cashback);
+            System.out.println(">> Yeay! " + getName() + " dapat Cashback sebesar Rp" + cashback);
         }
     }
 }

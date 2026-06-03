@@ -13,12 +13,20 @@ public class BankTransfer extends Payment {
 
     @Override
     public boolean validate() {
-        if (!super.validate()) return false; 
-        
+        // Pengecekan nominal dipindah ke sini karena parent-nya abstract
+        if (getAmount() <= 0) {
+            System.out.println("Validasi Gagal: Nominal transfer harus lebih dari Rp 0.");
+            return false;
+        }
         if (bankName == null || bankName.trim().isEmpty()) {
             System.out.println("Validasi Gagal: Nama Bank tujuan tidak boleh kosong!");
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String getPaymentMethod() {
+        return "Bank Transfer";
     }
 }
