@@ -98,7 +98,7 @@ public abstract class User {
         double totalPotongan = p.getAmount() + biayaAdmin;
 
         System.out.println("\n--- RINCIAN TRANSFER ---");
-        System.out.println("Metode           : " + p.getPaymentMethod()); // Diambil dari metode abstrak
+        System.out.println("Metode           : " + p.getPaymentMethod()); 
         System.out.println("Nominal Transfer : Rp" + p.getAmount());
         System.out.println("Biaya Admin      : Rp" + biayaAdmin);
         System.out.println("Total Potongan   : Rp" + totalPotongan);
@@ -107,7 +107,6 @@ public abstract class User {
         this.pay(totalPotongan); 
     }
 
-    // 3 Method abstrak wajib sesuai instruksi
     public abstract double getTransactionLimit();
     public abstract double getCashbackRate();
     public abstract String getAccountType();

@@ -30,7 +30,6 @@ public class Main {
             activeUser = new RegularUser("U001", "User Regular", "085877713117", 500000);
         }
         
-        // Memanfaatkan Abstract Method getAccountType()
         System.out.println("\n[!] Login sebagai: " + activeUser.getAccountType());
         System.out.println("[!] Limit per transaksi: Rp" + activeUser.getTransactionLimit());
 

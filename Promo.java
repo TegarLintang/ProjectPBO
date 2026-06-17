@@ -9,9 +9,7 @@ public abstract class Promo {
         return promoCode;
     }
 
-    // Abstract method untuk menghitung nilai promo
     public abstract double calculatePromoValue(double transactionAmount);
     
-    // Abstract method untuk rincian promo
     public abstract String getPromoDescription();
 }

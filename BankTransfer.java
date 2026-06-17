@@ -13,7 +13,6 @@ public class BankTransfer extends Payment {
 
     @Override
     public boolean validate() {
-        // Pengecekan nominal dipindah ke sini karena parent-nya abstract
         if (getAmount() <= 0) {
             System.out.println("Validasi Gagal: Nominal transfer harus lebih dari Rp 0.");
             return false;

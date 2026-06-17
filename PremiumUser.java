@@ -8,7 +8,6 @@ public class PremiumUser extends User {
         this.cashbackRate = 0.05;            
     }
 
-    // Override 3 method abstrak dari User
     @Override
     public double getTransactionLimit() { return transactionLimit; }
     

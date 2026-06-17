@@ -9,7 +9,6 @@ public abstract class Payment {
         return amount; 
     }
 
-    // 3 Method abstrak wajib sesuai instruksi
     public abstract double calculateFee();
     public abstract boolean validate();
     public abstract String getPaymentMethod();
