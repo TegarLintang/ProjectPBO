@@ -6,10 +6,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         
         System.out.println("=== LOGIN E-WALLET ===");
-        System.out.println("Pilih tipe akun Anda untuk masuk:");
-        System.out.println("1. Regular User (Limit Rp2 Juta, Cashback 1%)");
-        System.out.println("2. Premium User (Limit Rp10 Juta, Cashback 5%)");
-        System.out.println("3. Merchant User (Limit Rp50 Juta, Bisa terima pembayaran)");
+        System.out.println("1. Regular User | 2. Premium User | 3. Merchant User");
         System.out.print("Pilih (1-3): ");
         
         int tipeAkun = 1; 
@@ -17,7 +14,7 @@ public class Main {
             tipeAkun = scanner.nextInt();
             scanner.nextLine();
         } catch (InputMismatchException e) {
-            System.out.println("Input salah! Otomatis login sebagai Regular User.");
+            System.out.println("Input salah! Login sebagai Regular User.");
             scanner.nextLine();
         }
 
@@ -31,29 +28,34 @@ public class Main {
         }
         
         System.out.println("\n[!] Login sebagai: " + activeUser.getAccountType());
-        System.out.println("[!] Limit per transaksi: Rp" + activeUser.getTransactionLimit());
+        
+        // Coba load data dari file
+        activeUser.loadDataFromFile();
+
+        System.out.print("[!] Masukkan PIN Anda (Default: 123456): ");
+        if (!activeUser.verifyPin(scanner.nextLine())) {
+            System.out.println("Login Gagal! PIN Salah.");
+            return;
+        }
 
         boolean isRunning = true;
-
         while (isRunning) {
             System.out.println("\n=== MENU E-WALLET: " + activeUser.getName().toUpperCase() + " ===");
             System.out.println("1. Tampilkan Saldo");
             System.out.println("2. Top Up");
-            
-            if (activeUser instanceof MerchantUser) {
-                System.out.println("3. Bayar Tagihan");
-            } else {
-                System.out.println("3. Bayar Tagihan (Dapat Cashback!)");
-            }
-            
+            System.out.println("3. Bayar Tagihan (Pakai Promo)");
             System.out.println("4. Transfer Dana");
             System.out.println("5. Riwayat Transaksi");
+            System.out.println("6. Ganti PIN");
+            System.out.println("7. Split Bill (Bagi Tagihan Teman)");
+            System.out.println("8. Laporan Keuangan Bulanan");
+            System.out.println("9. Simpan Data ke File (Save)");
             
             if (activeUser instanceof MerchantUser) {
-                System.out.println("6. Terima Pembayaran (Khusus Merchant)");
-                System.out.println("7. Keluar");
+                System.out.println("10. Terima Pembayaran (Khusus Merchant)");
+                System.out.println("11. Keluar");
             } else {
-                System.out.println("6. Keluar");
+                System.out.println("10. Keluar");
             }
             
             System.out.print("Pilih menu: ");
@@ -63,9 +65,7 @@ public class Main {
                 scanner.nextLine(); 
 
                 switch (pilihan) {
-                    case 1:
-                        activeUser.showBalance();
-                        break;
+                    case 1: activeUser.showBalance(); break;
                     case 2:
                         System.out.print("Masukkan nominal Top Up: Rp");
                         activeUser.topUp(scanner.nextDouble());
@@ -73,70 +73,111 @@ public class Main {
                         break;
                     case 3:
                         System.out.print("Masukkan nominal Bayar: Rp");
-                        activeUser.pay(scanner.nextDouble()); 
+                        double tagihan = scanner.nextDouble();
                         scanner.nextLine();
+                        
+                        System.out.print("Kode Promo (DISKON10 / CASHBACK10K / Kosongi): ");
+                        String kode = scanner.nextLine();
+                        
+                        double totalAkhir = tagihan;
+                        Promo promo = null;
+                        
+                        if (kode.equalsIgnoreCase("DISKON10")) { promo = new DiscountPromo("DISKON10", 0.10); } 
+                        else if (kode.equalsIgnoreCase("CASHBACK10K")) { promo = new CashbackPromo("CASHBACK10K", 10000); }
+
+                        if (promo != null) {
+                            double nilaiPromo = promo.calculatePromoValue(tagihan);
+                            if (promo instanceof DiscountPromo) {
+                                totalAkhir -= nilaiPromo;
+                                System.out.println(">> Promo Aktif: " + promo.getPromoDescription());
+                            } else if (promo instanceof CashbackPromo) {
+                                System.out.println(">> Promo Aktif: " + promo.getPromoDescription());
+                            }
+                        }
+                        
+                        activeUser.pay(totalAkhir); 
+                        if (promo instanceof CashbackPromo && totalAkhir <= activeUser.getBalance() + totalAkhir) {
+                             activeUser.topUp(promo.calculatePromoValue(tagihan));
+                        }
                         break;
                     case 4:
-                        System.out.println("\n--- PILIH METODE TRANSFER ---");
-                        System.out.println("1. Bank Transfer (Admin Rp 2.500)");
-                        System.out.println("2. QR Payment (Admin 0.7% untuk nominal > Rp 100.000)");
-                        System.out.println("3. Wallet Transfer (Gratis)");
-                        System.out.print("Pilih metode (1-3): ");
-                        int metode = scanner.nextInt();
-                        scanner.nextLine();
-                        
-                        System.out.print("Masukkan nominal Transfer: Rp");
-                        double nomTransfer = scanner.nextDouble();
-                        scanner.nextLine(); 
-                        
-                        Payment transaksiTransfer = null;
-                        
-                        if (metode == 1) {
-                            System.out.print("Masukkan Nama Bank Tujuan: ");
-                            transaksiTransfer = new BankTransfer(nomTransfer, scanner.nextLine());
-                        } else if (metode == 2) {
-                            System.out.print("Masukkan ID QR Code: ");
-                            transaksiTransfer = new QRPayment(nomTransfer, scanner.nextLine());
-                        } else if (metode == 3) {
-                            System.out.print("Masukkan No HP Tujuan: ");
-                            transaksiTransfer = new WalletTransfer(nomTransfer, scanner.nextLine());
-                        } else {
-                            System.out.println("Metode transfer tidak valid!");
+                        System.out.print("\nMasukkan PIN: ");
+                        if (!activeUser.verifyPin(scanner.nextLine())) {
+                            System.out.println("Transfer Dibatalkan: PIN Salah!");
+                            break;
                         }
 
-                        if (transaksiTransfer != null) {
-                            activeUser.processPayment(transaksiTransfer); 
+                        System.out.println("1. Bank Transfer | 2. QR Payment | 3. Wallet Transfer");
+                        System.out.print("Pilih Metode: ");
+                        int metode = scanner.nextInt();
+                        scanner.nextLine();
+                        System.out.print("Nominal: Rp");
+                        double nom = scanner.nextDouble();
+                        scanner.nextLine(); 
+                        
+                        Payment transaksi = null;
+                        if (metode == 1) {
+                            System.out.print("Nama Bank: ");
+                            transaksi = new BankTransfer(nom, scanner.nextLine());
+                        } else if (metode == 2) {
+                            System.out.print("ID QR Code: ");
+                            transaksi = new QRPayment(nom, scanner.nextLine());
+                        } else if (metode == 3) {
+                            System.out.print("No HP: ");
+                            transaksi = new WalletTransfer(nom, scanner.nextLine());
                         }
+
+                        if (transaksi != null) activeUser.processPayment(transaksi); 
                         break;
-                    case 5:
-                        activeUser.showTransactionHistory();
-                        break;
+                    case 5: activeUser.showTransactionHistory(); break;
                     case 6:
+                        System.out.print("Masukkan PIN Lama: ");
+                        String oldPin = scanner.nextLine();
+                        System.out.print("Masukkan PIN Baru: ");
+                        String newPin = scanner.nextLine();
+                        activeUser.changePin(oldPin, newPin);
+                        break;
+                    case 7:
+                        System.out.print("Total Tagihan: Rp");
+                        double totalBill = scanner.nextDouble();
+                        System.out.print("Dibagi berapa orang?: ");
+                        int totalPeople = scanner.nextInt();
+                        scanner.nextLine();
+                        if (totalPeople > 1) {
+                            double perPerson = totalBill / totalPeople;
+                            System.out.println(">> Masing-masing membayar: Rp" + perPerson);
+                            System.out.print("Bayar porsi Anda sekarang? (Y/N): ");
+                            if (scanner.nextLine().equalsIgnoreCase("Y")) { activeUser.pay(perPerson); }
+                        } else { System.out.println("Gagal: Minimal 2 orang!"); }
+                        break;
+                    case 8: 
+                        activeUser.generateMonthlyReport(); 
+                        break;
+                    case 9: 
+                        activeUser.saveDataToFile(); 
+                        break;
+                    case 10:
                         if (activeUser instanceof MerchantUser) {
-                            System.out.print("Masukkan nominal Pembayaran Masuk: Rp");
+                            System.out.print("Nominal Pembayaran Masuk: Rp");
                             ((MerchantUser) activeUser).receivePayment(scanner.nextDouble());
                             scanner.nextLine();
                         } else {
-                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
-                            isRunning = false;
+                            System.out.println("Terima kasih!"); isRunning = false;
                         }
                         break;
-                    case 7:
+                    case 11:
                         if (activeUser instanceof MerchantUser) {
-                            System.out.println("Terima kasih telah menggunakan E-Wallet!");
-                            isRunning = false;
+                            System.out.println("Terima kasih!"); isRunning = false;
                         } else {
-                            System.out.println("Pilihan tidak ada.");
+                            System.out.println("Pilihan tidak valid.");
                         }
                         break;
-                    default:
-                        System.out.println("Pilihan tidak ada.");
+                    default: System.out.println("Pilihan tidak valid.");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Error: Input tidak valid! Anda harus memasukkan angka.");
+                System.out.println("Error: Input harus angka.");
                 scanner.nextLine(); 
             }
         }
-        scanner.close();
     }
 }

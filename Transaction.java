@@ -14,6 +14,12 @@ public class Transaction {
         this.status = status;
     }
 
+    // --- TAMBAHAN GETTER UNTUK FITUR LAPORAN BULANAN ---
+    public double getAmount() { return amount; }
+    public String getType() { return type; }
+    public String getStatus() { return status; }
+    // ---------------------------------------------------
+
     public void printTransaction() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedTime = timestamp.format(formatter);
